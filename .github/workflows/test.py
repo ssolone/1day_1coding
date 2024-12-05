@@ -7,5 +7,5 @@ soup = bs(page.text, "html.parser")
 news = soup.find_all("div", {"class":"container__headline container_list-images-with-description__headline"})
 news_title = soup.find_all("span", {"class":"container__headline-text"})
 
-for index, news in enumerate(news, 1):
+for index in enumerate(news, 1):
     print("{} 번째 뉴스 : {}".format(index, news_title.text))
