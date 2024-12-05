@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup as bs
 
-page = requests.get("https://search.naver.com/search.naver?ssc=tab.news.all&where=news&sm=tab_jum&query=AI")
+page = requests.get("https://edition.cnn.com/search?q=AI&from=0&size=10&page=1&sort=newest&types=all&section=")
 soup = bs(page.text, "html.parser")
 
-elements = soup.select('div.news_contents a > title')
+news = soup.find_all("div", {"class":"container__headline container_list-images-with-description__headline"})
+news_title = soup.find_all("span", {"class":"container__headline-text"})
 
-for index, element in enumerate(elements, 1):
-    print("{} 번째 뉴스 제목 : {}".format(index, element.text))
+for index, news in enumerate(news, 1):
+    print("{} 번째 뉴스 : {}".format(index, news_title.text))
