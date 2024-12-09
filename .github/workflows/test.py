@@ -15,5 +15,17 @@ results = soup.find(id="ResultsContainer")
 news_title = soup.find_all("h4", {"class":"cn_title"})
 media_com = soup.find_all("div", {"class":"cn_name"})
 
+data = []
+
 for i in range(len(news_title)):
-  print(i+1,".", news_title[i].text,"[",media_com[i].text,"]")
+  num = i
+  title = news_title[i].text
+  media = media_com[i].text
+  data.append([num, title, media])
+
+print(data)
+
+with open('news.csv', 'w') as file:
+  file.write('No,Title,Media\n')
+  for i in data:
+      file.write('{0},{1},{2}\n'.format(i[0], i[1], i[2]))
