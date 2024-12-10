@@ -4,28 +4,24 @@ from bs4 import BeautifulSoup as bs
 page = requests.get("https://news.naver.com/?viewType=pc")
 soup = bs(page.content, "html.parser")
 
-#news = soup.find_all("div", {"class":"container__headline container_list-images-with-description__headline"})
-#news_title = soup.find_all("span", {"class":"container__headline-text"})
-
-#for index in enumerate(news, 1):
-#    print("{} 번째 뉴스 : {}".format(index, news_title.text))
-
 results = soup.find(id="ResultsContainer")
 
 news_title = soup.find_all("h4", {"class":"cn_title"})
 media_com = soup.find_all("div", {"class":"cn_name"})
+news_link = soup.find_all("a", {"class":"cjs_nf_a _item _cds_link _newsflash_link"})
 
 data = []
 
 for i in range(len(news_title)):
-  num = i
+  num = i+1
   title = news_title[i].text
   media = media_com[i].text
-  data.append([num, title, media])
+  link = news_link[i].get("href")
+  data.append([num, title, media, link])
 
 print(data)
 
 with open('news.csv', 'w') as file:
-  file.write('No,Title,Media\n')
+  file.write('No,Title,Media,Link\n')
   for i in data:
-      file.write('{0},{1},{2}\n'.format(i[0], i[1], i[2]))
+      file.write('{0},{1},{2},{3}\n'.format(i[0], i[1], i[2], i[3]))
