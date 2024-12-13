@@ -16,12 +16,12 @@ for i in range(len(news_title)):
   num = i+1
   title = news_title[i].text
   media = media_com[i].text
-  link = news_link[i].get("href")
+  link = "https://news.naver.com" + news_link[i].get("href")
   data.append([num, title, media, link])
 
 print(data)
 
-with open('news.csv', 'w') as file:
-  file.write('No,Title,Media,Link\n')
-  for i in data:
-      file.write('{0},{1},{2},{3}\n'.format(i[0], i[1], i[2], i[3]))
+with open('news.csv', 'w', newline='', encoding='utf-8-sig') as file:
+  writer = csv.writer(file)
+  writer.writerow(['No', 'Title', 'Media', 'Link'])
+  writer.writerows(data)
