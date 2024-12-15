@@ -25,11 +25,13 @@ for i in range(len(news)):
   title = news[i].text
   media = media_com[i].text
   link = 'https://news.google.com'+news[i].get("href")
-  data.append([num, title, media, link])
+article = requests.get(link)
+article_text = bs(article.content, 'html.parser')
+data.append([num, title, media, link, article_text.text])
 
 print(data)
 
 with open('news.csv', 'w', newline='', encoding='utf-8-sig') as file:
   writer = csv.writer(file)
-  writer.writerow(['No', 'Title', 'Media', 'Link'])
+  writer.writerow(['No', 'Title', 'Media', 'Link', 'Article'])
   writer.writerows(data)
