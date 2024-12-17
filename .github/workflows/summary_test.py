@@ -1,24 +1,20 @@
-from sumy.summarizers.lex_rank import LexRankSummarizer
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.parsers.plaintext import PlaintextParser
-import requests
-from bs4 import BeautifulSoup as bs
+import feedparser
+from newspaper import Article
+from summa.summarizer import summarize
 
-def get_text(filename):
-    with open(filename, 'r') as f:
-        text = f.read()
-    return text
+rss_url = "http://feeds.feedburner.com/inven"
 
+print(len(rss_feed.entries))
 
-def summarize_text(text, sentences_count=3):
-    parser = PlaintextParser.from_string(text, Tokenizer('english'))
-    summarizer = LexRankSummarizer()
-    summary = summarizer(parser.document, sentences_count)
-    summary = [str(sentence) for sentence in summary]
-    return ' '.join(summary)
+for p in rss_feed.entries:
 
-link = 'https://n.news.naver.com/mnews/article/018/0005908119?sid=105'
-get_con = requests.get(link)
-soup_con = bs(get_con.content, 'html.parser')
+    url = p.link
 
-text = get_text(soup_con)
+article = Article(url, language = 'ko')
+article.download()
+article.parse()
+
+NewsFeed = article.text
+NewsSum = summarize(NewsFeed)
+
+print(article.title + '\n' + NewsFeed + '\n' + NewsSum)
