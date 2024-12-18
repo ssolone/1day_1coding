@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup as bs
 import csv
 from summa.summarizer import summarize
+from newspaper import Article
+
 
 #page = requests.get("https://news.naver.com/?viewType=pc")
 #soup = bs(page.content, "html.parser")
@@ -27,9 +29,10 @@ for i in range(len(news)):
   media = media_com[i].text
   link = 'https://news.google.com'+news[i].get("href")
   get_con = requests.get(link)
-  soup_con = bs(get_con.content, 'html.parser')
-  article = soup_con.text
-  article_summ = summarize(article)
+  news = Article(url, language='en')
+  news.download()
+  news.parse()
+  article_sum = summarize(news.text)
   data.append([num, title, media, link, article_summ])
 
 print(data)
