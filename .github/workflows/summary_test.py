@@ -1,53 +1,60 @@
-import nltk 
-from nltk.corpus import stopwords 
-from nltk.tokenize import word_tokenize, sent_tokenize 
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
 
-# Input text - to summarize  
-text = """ """
+def fetch_news(query):
+    url = f"https://search.naver.com/search.naver?where=news&query={query}"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    news_data = []
 
-# Tokenizing the text 
-stopWords = set(stopwords.words("english")) 
-words = word_tokenize(text) 
+    for item in soup.select('.news_wrap'):
+        title_tag = item.select_one('.news_tit')
+        title = title_tag.get_text() if title_tag else 'No Title'
+        link = title_tag['href'] if title_tag else 'No Link'
+        
+        media_tag = item.select_one('.info_group .press')
+        media = media_tag.get_text() if media_tag else 'No Media'
 
-# Creating a frequency table to keep the  
-# score of each word 
+        date_tag = item.select_one('.info_group .info')
+        date = date_tag.get_text() if date_tag else 'No Date'
+        
+        summary = extract_and_summarize(link)
 
-freqTable = dict() 
-for word in words: 
-    word = word.lower() 
-    if word in stopWords: 
-        continue
-    if word in freqTable: 
-        freqTable[word] += 1
-    else: 
-        freqTable[word] = 1
+        news_data.append({
+            'Title': title,
+            'Date': date,
+            'Media': media,
+            'Link': link,
+            'Summary': summary
+        })
 
-# Creating a dictionary to keep the score 
-# of each sentence 
-sentences = sent_tokenize(text) 
-sentenceValue = dict() 
+    return news_data
 
-for sentence in sentences: 
-    for word, freq in freqTable.items(): 
-        if word in sentence.lower(): 
-            if sentence in sentenceValue: 
-                sentenceValue[sentence] += freq 
-            else: 
-                sentenceValue[sentence] = freq 
+def extract_and_summarize(link):
+    try:
+        page = requests.get(link)
+        soup = BeautifulSoup(page.content, 'html.parser')
 
+        paragraphs = soup.find_all('p')
+        text = ' '.join([para.get_text() for para in paragraphs])
 
+        # 문장 분리
+        sentences = text.split('. ')
+        # 가장 긴 문장 3개 선택
+        sentences = sorted(sentences, key=len, reverse=True)[:3]
+        summary = '. '.join(sentences)
 
-sumValues = 0
-for sentence in sentenceValue: 
-    sumValues += sentenceValue[sentence] 
+        return summary
+    except Exception as e:
+        return f"Error: {e}"
 
-# Average value of a sentence from the original text 
+def save_to_csv(news_data, filename='naver_news.csv'):
+    df = pd.DataFrame(news_data)
+    df.to_csv(filename, index=False, encoding='utf-8-sig')
+    print(f"Data saved to {filename}")
 
-average = int(sumValues / len(sentenceValue)) 
-
-# Storing sentences into our summary. 
-summary = '' 
-for sentence in sentences: 
-    if (sentence in sentenceValue) and (sentenceValue[sentence] > (1.2 * average)): 
-        summary += " " + sentence 
-print(summary) 
+query = 'AI'
+news_data = fetch_news(query)
+save_to_csv(news_data)
