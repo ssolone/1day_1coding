@@ -3,12 +3,14 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-def fetch_news(query):
+def fetch_news(query, num_results=10):
     url = f"https://search.naver.com/search.naver?where=news&query={query}"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
     news_data = []
 
+    for start in range(1, num_results + 1, 10):  # Pagination을 고려하여 10개씩 요청
+        response = requests.get(f"{url}&start={start}")
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
     for item in soup.select('.news_wrap'):
         title_tag = item.select_one('.news_tit')
         title = title_tag.get_text() if title_tag else 'No Title'
@@ -29,12 +31,13 @@ def fetch_news(query):
             'Link': link,
             'Summary': summary
         })
+        time.sleep(1)
 
     return news_data
 
 def extract_and_summarize(link):
     try:
-        page = requests.get(link)
+        page = requests.get(link, timeout=5)
         soup = BeautifulSoup(page.content, 'html.parser')
 
         paragraphs = soup.find_all('p')
@@ -56,5 +59,5 @@ def save_to_csv(news_data, filename='naver_news.csv'):
     print(f"Data saved to {filename}")
 
 query = 'AI'
-news_data = fetch_news(query)
+news_data = fetch_news(query, num_results=30)
 save_to_csv(news_data)
