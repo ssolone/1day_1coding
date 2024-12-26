@@ -4,7 +4,6 @@ import csv
 from summa.summarizer import summarize
 from newspaper import Article
 import feedparser
-from newspaper import Article
 
 #page = requests.get("https://news.naver.com/?viewType=pc")
 #soup = bs(page.content, "html.parser")
