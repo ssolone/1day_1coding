@@ -30,8 +30,8 @@ for i in range(len(news)):
   get_con = requests.get(link)
   article_soup = bs(get_con.content, 'html.parser')
   
-  article_sum = summarize(news.text)
-  data.append([num, title, media, link, article_summ])
+  article_sum = summarize(article_soup.text)
+  data.append([num, title, media, link, article_sum])
 
 print(data)
 
