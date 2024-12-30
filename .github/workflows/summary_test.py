@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import random
 
 def fetch_news(query, num_results=10):
     url = f"https://search.naver.com/search.naver?where=news&query={query}"
@@ -31,7 +32,10 @@ def fetch_news(query, num_results=10):
             'Link': link,
             'Summary': summary
         })
-        time.sleep(1)
+        time.sleep(random.uniform(1, 3)) 
+    except Exception as e:
+            print(f"Error fetching page {start}: {e}")
+            continue
 
     return news_data
 
